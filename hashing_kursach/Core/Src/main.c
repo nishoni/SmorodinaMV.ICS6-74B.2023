@@ -87,8 +87,7 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
   lcd_init();
-  int8_t* a = "test1_test";
-  lcd_puts(0,0,(int8_t*)a);
+  lcd_puts(0,0,(int8_t*)"test_test");
   HAL_Delay(5000);
   lcd_clear();
   /* USER CODE END 2 */
