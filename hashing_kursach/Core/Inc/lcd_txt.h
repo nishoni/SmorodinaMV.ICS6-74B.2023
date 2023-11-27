@@ -39,8 +39,8 @@
 
 /*------------ Declaring Function Prototype -------------*/
 void lcd_init(void);
-void lcd_write(uint8_t type,uint8_t data);
-void lcd_puts(uint8_t x, uint8_t y, int8_t *string);
+void lcd_write(int8_t type, int8_t data);
+void lcd_puts(int8_t x, int8_t y, int8_t *string);
 void lcd_clear(void);
 #endif
 
