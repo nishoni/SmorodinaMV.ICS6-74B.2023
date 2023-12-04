@@ -31,7 +31,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "uart.h"
+#include "lcd_txt.h"
+#include "algorithm_interface.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

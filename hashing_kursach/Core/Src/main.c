@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd_txt.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,21 +40,59 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+uint8_t UART1_rxBuffer[26] = {0};
+int8_t *data = "";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//    HAL_UART_Transmit(&huart1, UART1_rxBuffer, 26, 100);
+//    HAL_UART_Receive_IT(&huart1, UART1_rxBuffer, 26);
+//}
 
+int8_t* chosen_algorithm(int id) {
+	switch (id) {
+		case 0:
+			return "sha256";
+		case 1:
+			return "md5";
+		case 2:
+			return "crc16";
+		default:
+			return "Invalid algorithm";
+			break;
+	}
+}
+
+//void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+//{
+//	if(huart->Instance == USART1);
+//	{
+//		HAL_UART_Transmit(&huart1,data,sizeof(data),1000);
+//		if(data == "0x5A")
+//		{
+////			LED1_ON();
+////
+////			LED2_ON();// LED2 bright as a data transfer indicator
+//			HAL_UART_Transmit(&huart1,"hi",sizeof("hi"),1000);// Blocking send function
+//			HAL_UART_Receive_IT(&huart1,&data,1);
+////			LED2_OFF();// LED2 is destroyed as a data transfer indicator
+//		}
+//	}
+//}
 /* USER CODE END 0 */
 
 /**
@@ -85,12 +123,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  int8_t *output, data;
+  int alg_id = 0;
   lcd_init();
-  int8_t* a = "test1_test";
-  lcd_puts(0,0,(int8_t*)a);
-  HAL_Delay(5000);
-  lcd_clear();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,6 +138,36 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  /* scrolling through algorithms
+			ids: 0 - sha, 1 - md, 2 - crc
+	  */
+	  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == 1) {
+		  if (alg_id < 2) {
+			  alg_id++;
+		  } else {
+			  alg_id = 0;
+		  }
+		  lcd_clear();
+	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2) == 1) {
+		  if (alg_id > 0) {
+			  alg_id--;
+		  } else {
+			  alg_id = 2;
+		  }
+		  lcd_clear();
+	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == 1) {
+		  lcd_clear();
+		  output = chosen_algorithm(alg_id);
+		  lcd_puts(0, 0, (int8_t*) output);
+		  lcd_clear();
+		  do_algorithm(alg_id);
+		  HAL_Delay(50000);
+	  }
+
+
+	  output = chosen_algorithm(alg_id);
+	  lcd_puts(0, 0, (int8_t*) output);
+	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -141,6 +209,39 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -153,6 +254,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13
