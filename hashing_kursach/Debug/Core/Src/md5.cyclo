@@ -1,7 +1,0 @@
-md5.c:61:10:rotateLeft	1
-md5.c:69:6:md5Init	1
-md5.c:84:6:md5Update	4
-md5.c:117:6:md5Finalize	4
-md5.c:151:6:md5Step	6
-md5.c:198:6:md5String	1
-md5.c:207:6:md5File	2
