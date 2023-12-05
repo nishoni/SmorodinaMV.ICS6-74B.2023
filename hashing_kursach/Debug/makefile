@@ -64,7 +64,7 @@ main-build: kursach_c8.elf secondary-outputs
 
 # Tool invocations
 kursach_c8.elf kursach_c8.map: $(OBJS) $(USER_OBJS) D:\kursach_mps_7_sem\kursach_c8\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "kursach_c8.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\kursach_mps_7_sem\kursach_c8\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="kursach_c8.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "kursach_c8.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\kursach_mps_7_sem\kursach_c8\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="kursach_c8.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
