@@ -18,7 +18,9 @@
 #include "sha256.h"
 
 extern UART_HandleTypeDef huart1;
+extern unsigned char *data;
+extern state;
 
-void do_algorithm(int algorithm_id);
+void do_algorithm(int8_t* data, int algorithm_id);
 
 #endif /* INC_ALGORITHM_INTERFACE_H_ */

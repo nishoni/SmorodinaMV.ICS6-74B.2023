@@ -44,7 +44,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 uint8_t UART1_rxBuffer[26] = {0};
-int8_t *data = "";
+int state = 0; // 0 - input, 1 - choose alg
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,8 +103,9 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   int8_t *output, data;
-  int alg_id = 0;
+  int alg_id = 0, not_asked_for_input = 1;
   lcd_init();
+//  state = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,33 +118,55 @@ int main(void)
 	  /* scrolling through algorithms
 	  			ids: 0 - sha, 1 - md, 2 - crc
 	  	  */
-	  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == 1) {
-		  if (alg_id < 2) {
-			  alg_id++;
-		  } else {
-			  alg_id = 0;
+	  if (state == 0) {
+		  if (not_asked_for_input == 1) {
+			  lcd_puts(0, 0, "Input data");
+			  not_asked_for_input = 0;
 		  }
-		  lcd_clear();
-	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2) == 1) {
-		  if (alg_id > 0) {
-			  alg_id--;
-		  } else {
-			  alg_id = 2;
+
+		  HAL_UART_Receive(&huart1, (int8_t*)data, 10, 5000);
+
+		  if (strlen(data) != 2) {
+			  lcd_clear();
+			  lcd_puts(0, 0, data);
+			  HAL_Delay(1000);
+			  lcd_clear();
+			  state = 1;
 		  }
+	  } else if (state == 1) {
+		  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3) == 1) {
+			  if (alg_id < 2) {
+				  alg_id++;
+			  } else {
+				  alg_id = 0;
+			  }
+			  lcd_clear();
+		  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2) == 1) {
+			  if (alg_id > 0) {
+				  alg_id--;
+			  } else {
+				alg_id = 2;
+			  }
+			  lcd_clear();
+		  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == 1) {
+			  lcd_clear();
+			  output = chosen_algorithm(alg_id);
+			  lcd_puts(0, 0, (int8_t*) output);
+			  lcd_clear();
+			  do_algorithm(data, alg_id);
+			  not_asked_for_input = 1;
+		  }
+
+		  if (state != 0) {
+			  output = chosen_algorithm(alg_id);
+			  lcd_puts(0, 0, (int8_t*) output);
+			  HAL_Delay(200);
+		  }
+	  } else if (state != 2) {
 		  lcd_clear();
-	  } else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == 1) {
-		  lcd_clear();
-		  output = chosen_algorithm(alg_id);
-		  lcd_puts(0, 0, (int8_t*) output);
-		  lcd_clear();
-		  do_algorithm(alg_id);
-		  HAL_Delay(50000);
+		  lcd_init();
+		  lcd_puts(0, 0, "Unexpected state");
 	  }
-
-
-	  output = chosen_algorithm(alg_id);
-	  lcd_puts(0, 0, (int8_t*) output);
-	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
