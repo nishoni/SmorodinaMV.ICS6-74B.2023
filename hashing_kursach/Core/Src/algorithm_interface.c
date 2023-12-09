@@ -44,8 +44,13 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 				lcd_clear();
 				lcd_init();
 				lcd_puts(0, 0, (uint8_t*)"Starting sha256");
+//				SHA1_CTX foo;
 				sha256_context foo;
 				unsigned char hash[32];
+
+//				SHA1Init(&foo);
+//				SHA1Update(&foo, data, strlen(data));
+//				SHA1Final(&foo, hash);
 
 				sha256_init(&foo);
 				sha256_update(&foo, data, strlen(data));
