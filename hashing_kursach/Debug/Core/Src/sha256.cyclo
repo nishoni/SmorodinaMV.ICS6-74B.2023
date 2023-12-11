@@ -1,4 +1,4 @@
 sha256.c:41:6:sha256_init	1
-sha256.c:56:6:sha256_process	5
-sha256.c:124:6:sha256_update	7
-sha256.c:171:6:sha256_finish	3
+sha256.c:56:6:sha256_process	2
+sha256.c:188:6:sha256_update	7
+sha256.c:235:6:sha256_finish	3
