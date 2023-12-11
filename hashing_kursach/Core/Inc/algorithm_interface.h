@@ -17,9 +17,9 @@
 #include "crc16.h"
 #include "sha256.h"
 
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 extern unsigned char *data;
-extern state;
+extern int state;
 
 void do_algorithm(int8_t* data, int algorithm_id);
 

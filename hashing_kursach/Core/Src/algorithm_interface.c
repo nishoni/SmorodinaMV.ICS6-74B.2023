@@ -37,6 +37,10 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 	char *output;
 	int j = 0, i = 0, k = 0;
 	lcd_init();
+	HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\n\r\nYour data:\r\n", 15);
+	HAL_Delay(100);
+	HAL_UART_Transmit_IT(&huart2, (int8_t*)data, strlen(data));
+	HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\n", 2);
 	switch (algorithm_id) {
 			case 0:
 				// sha256
@@ -44,13 +48,8 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 				lcd_clear();
 				lcd_init();
 				lcd_puts(0, 0, (uint8_t*)"Starting sha256");
-//				SHA1_CTX foo;
 				sha256_context foo;
 				unsigned char hash[32];
-
-//				SHA1Init(&foo);
-//				SHA1Update(&foo, data, strlen(data));
-//				SHA1Final(&foo, hash);
 
 				sha256_init(&foo);
 				sha256_update(&foo, data, strlen(data));
@@ -59,16 +58,25 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 				HAL_Delay(1000);
 				lcd_clear();
 				lcd_puts(0, 0, (uint8_t*)"Result of sha256:");
+				HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\nResult of sha256:\r\n", 24);
 				HAL_Delay(500);
 
 				lcd_clear();
-				while (k < 16) {
+				while (k < 32) {
+					if (k == 16) {
+						HAL_Delay(2000);
+						lcd_clear();
+						i = 0;
+						j = 0;
+						HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\n", 2);
+					}
 					sprintf(output, "%02x", hash[k]);
 					if (i == 16) {
 						i = 0;
 						j = 1;
 					}
 					lcd_puts(j, i, (uint8_t*)output);
+					HAL_UART_Transmit_IT(&huart2, (int8_t*)output, 2);
 					++k;
 					i += 2;
 				}
@@ -89,19 +97,20 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 				HAL_Delay(1000);
 				lcd_clear();
 				lcd_puts(0, 0, (uint8_t*)"Result of md5:");
+				HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\nResult of md5:\r\n", 20);
 				HAL_Delay(500);
 
 				lcd_clear();
 
 				while (k < 16) {
 					sprintf((char*)output, "%02x", md5_result[k]);
-					if (i == 8) {
+					if (i == 16) {
 						i = 0;
 						j = 1;
 					}
 
-
 					lcd_puts(j, i, (uint8_t*)output);
+					HAL_UART_Transmit_IT(&huart2, (int8_t*)output, 2);
 					k++;
 					i += 2;
 				}
@@ -121,12 +130,14 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 				HAL_Delay(1000);
 				lcd_clear();
 				lcd_puts(0, 0, (uint8_t*)"Result of crc16:");
+				HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\nResult of crc16:\r\n", 23);
 				HAL_Delay(500);
 
 				sprintf(output, "%hX", result);
 				HAL_Delay(1000);
 				lcd_clear();
 				lcd_puts(0, 0, output);
+				HAL_UART_Transmit_IT(&huart2, (int8_t*)output, 4);
 
 				HAL_Delay(1000);
 				lcd_clear();
@@ -139,6 +150,7 @@ void do_algorithm(int8_t* data, int algorithm_id) {
 				HAL_Delay(1000);
 				break;
 		}
+	HAL_UART_Transmit_IT(&huart2, (int8_t*)"\r\n\r\n", 4);
 	HAL_Delay(1000);
 	state = 0;
 	lcd_clear();

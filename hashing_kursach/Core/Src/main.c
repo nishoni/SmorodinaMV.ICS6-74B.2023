@@ -133,9 +133,9 @@ int main(void)
 		  // Input place
 		  switch (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_14)) {
 		  	  case 0: // computer
-		  		HAL_UART_Receive(&huart2, (int8_t*)data, 1000, 5000);
+		  		HAL_UART_Receive(&huart2, (int8_t*)data, 1000, 3000);
 		  	  case 1: // phone
-		  		HAL_UART_Receive(&huart1, (int8_t*)data, 1000, 5000);
+		  		HAL_UART_Receive_IT(&huart1, (int8_t*)data, 1000);
 		  }
 
 
@@ -168,7 +168,6 @@ int main(void)
 			  lcd_clear();
 			  do_algorithm(data, alg_id);
 			  not_asked_for_input = 1;
-//			  free(data);
 			  data = NULL;
 		  }
 
